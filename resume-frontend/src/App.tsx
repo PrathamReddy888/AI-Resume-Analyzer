@@ -1,0 +1,143 @@
+import { useState } from "react";
+import axios from "axios";
+import "./index.css";
+
+function App() {
+
+  const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [score, setScore] = useState<number | null>(null);
+  const [skills, setSkills] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
+
+  const uploadResume = async () => {
+
+    if (!file) {
+      alert("Please upload resume");
+      return;
+    }
+
+    try {
+
+      setLoading(true);   
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await axios.post(
+        "http://127.0.0.1:8000/api/upload/",
+        formData
+      );
+
+      setScore(res.data.score);
+      setSkills(res.data.skills_found);
+      setSuggestions(res.data.suggestions);
+
+      setLoading(false);   
+
+    } catch (error) {
+      console.error(error);
+      alert("Upload failed");
+      setLoading(false);   
+    }
+
+  };
+
+  return (
+
+    <div className="container mt-5">
+
+      <div className="main-card text-center">
+
+        <h1 className="mb-4">🚀 AI Resume Analyzer</h1>
+        <div className="upload-box mb-3">
+
+          <input
+            type="file"
+            id="fileUpload"
+            hidden
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              if (e.target.files) {
+                setFile(e.target.files[0]);
+              }
+            }}
+          />
+
+          <label htmlFor="fileUpload" className="upload-label">
+            📄 {file ? file.name : "Drag & Drop Resume or Click to Upload"}
+          </label>
+
+        </div>
+
+        <button
+          className="analyze-btn"
+          onClick={uploadResume}
+        >
+          {loading ? "⏳ Analyzing..." : "🚀 Analyze Resume"}
+        </button>
+
+        {score !== null && (
+
+          <>
+
+            {/* SCORE METER */}
+
+            <div className="score-section">
+
+              <div
+                className="score-circle mb-3"
+                style={{ "--score": `${score * 3.6}deg` } as React.CSSProperties}
+              >
+                {score}%
+              </div>
+
+              <h3>ATS Resume Score</h3>
+
+              <h5 className="analysis-done">
+                ✅ Resume Analysis Complete
+              </h5>
+
+            </div>
+
+            {/* SKILLS */}
+
+            <div className="mt-4">
+
+              <h4>Skills Found</h4>
+
+              {skills.length === 0 && <p>No skills detected</p>}
+
+              {skills.map((skill: string, i: number) => (
+                <span key={i} className="skill-badge">
+                  {skill}
+                </span>
+              ))}
+
+            </div>
+
+            {/* SUGGESTIONS */}
+
+            <div className="suggestion-box">
+
+              <h4>💡 Suggestions</h4>
+
+              {suggestions.map((s, i) => (
+                <div key={i} className="suggestion-item">
+                  📌 {s}
+                </div>
+              ))}
+
+            </div>
+
+          </>
+
+        )}
+
+      </div>
+
+    </div>
+  );
+}
+
+export default App;
