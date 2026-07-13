@@ -53,9 +53,6 @@ def upload_resume(request):
         suggestions.append("Add frontend skills like React")
 
 
-    # TEMPORARY TESTING BLOCK FOR ISSUE #6
-    # Overwrites detected_skills with 50 fake items to verify UI layout boundaries
-    detected_skills = [f"Skill-{i}" for i in range(1, 51)]
     # --- NEW SKILL GAP ANALYSIS LOGIC ---
     matched_skills = []
     missing_skills = []
