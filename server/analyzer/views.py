@@ -1,12 +1,25 @@
-from rest_framework.decorators import api_view, parser_classes, permission_classes
+from rest_framework.decorators import api_view, parser_classes, permission_classes, throttle_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import SimpleRateThrottle
 from rest_framework import status
 import pdfplumber
+from django.conf import settings
 
 from .models import ResumeAnalysis
 from .serializers import SignupSerializer, ResumeAnalysisSerializer
+
+
+class UploadRateThrottle(SimpleRateThrottle):
+    scope = "upload"
+
+    def get_rate(self):
+        return getattr(settings, "RESUME_UPLOAD_RATE", "10/hour")
+
+    def get_cache_key(self, request, view):
+        ident = self.get_ident(request)  # client IP
+        return self.cache_format % {"scope": self.scope, "ident": ident}
 
 skills_list = [
     "python", "django", "react", "javascript", "sql",
@@ -36,6 +49,7 @@ def signup(request):
 @api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser])
 @permission_classes([AllowAny])
+@throttle_classes([UploadRateThrottle])
 def upload_resume(request):
     file = request.FILES.get("file")
     target_role = request.data.get("role", None)
