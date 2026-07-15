@@ -168,6 +168,13 @@ python manage.py runserver
 ```
 The API server starts on: `http://127.0.0.1:8000/`
 
+#### Server Environment Variables
+| Variable | Description | Default / Placeholder |
+| :--- | :--- | :--- |
+| `SECRET_KEY` | Secret key for Django cryptographic signing | `django-insecure-local-development-secret-key-change-me` |
+| `DEBUG` | Set to `True` for development, `False` for production | `True` |
+| `ALLOWED_HOSTS` | Comma-separated list of allowed host/domain names | `localhost,127.0.0.1,127.0.0.1:8000` |
+
 ---
 
 ### Client Setup (React)
@@ -189,6 +196,11 @@ npm install
 npm run dev
 ```
 The client application will run at: `http://localhost:5173/`
+
+#### Client Environment Variables
+| Variable | Description | Default / Placeholder |
+| :--- | :--- | :--- |
+| `VITE_BACKEND_URL` | The URL of the Django backend REST API server | `http://127.0.0.1:8000` |
 
 ---
 
