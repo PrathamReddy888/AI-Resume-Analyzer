@@ -1,3 +1,4 @@
+import re
 import os
 import pdfplumber
 from django.contrib.auth import get_user_model
@@ -7,61 +8,54 @@ User = get_user_model()
 
 
 SKILLS = [
-    "python",
-    "django",
-    "react",
-    "javascript",
-    "typescript",
-    "html",
-    "css",
-    "tailwind",
-    "sql",
-    "mysql",
-    "postgresql",
-    "mongodb",
-    "git",
-    "github",
-    "flask",
-    "docker",
-    "aws",
-    "machine learning",
-    "data analysis",
-    "excel",
+    # Languages — only include ones unlikely to false-match as common words
+    "python", "java", "c++", "javascript", "typescript",
+    "kotlin", "swift", "ruby", "php", "rust",
+
+    # C and single-letter langs need explicit listing but matched carefully
     "c",
-    "c++",
-    "java",
+
+    # Web Frontend
+    "html", "css", "react", "react.js", "angular", "vue", "vue.js",
+    "next.js", "tailwind", "bootstrap", "sass", "webpack",
+
+    # Web Backend
+    "node.js", "express", "express.js", "django", "flask", "fastapi",
+    "spring boot", "laravel",
+
+    # Databases
+    "sql", "mysql", "postgresql", "mongodb", "firebase", "redis",
+    "sqlite", "cassandra", "dynamodb",
+
+    # ML / AI
+    "machine learning", "deep learning", "data analysis",
+    "tensorflow", "keras", "pytorch", "scikit-learn", "opencv",
+    "mediapipe", "lstm", "cnn", "llm", "nlp", "pandas", "numpy",
+    "matplotlib", "seaborn", "huggingface",
+
+    # Cloud & DevOps
+    "aws", "azure", "gcp", "docker", "kubernetes", "terraform", "linux",
+
+    # Tools
+    "git", "github", "postman", "jupyter", "vs code", "excel",
 ]
 
 
 ROLE_SKILLS = {
     "Frontend Developer": [
-        "html",
-        "css",
-        "javascript",
-        "react",
-        "typescript",
-        "tailwind",
-        "git",
-        "github",
+        "html", "css", "javascript", "typescript", "react",
+        "next.js", "tailwind", "git", "github", "webpack",
     ],
 
     "Backend Developer": [
-        "python",
-        "django",
-        "flask",
-        "sql",
-        "mysql",
-        "git",
-        "github",
-        "docker",
+        "python", "django", "flask", "fastapi", "node.js", "express.js",
+        "sql", "mysql", "postgresql", "mongodb", "docker", "git", "github",
     ],
 
     "Data Analyst": [
-        "python",
-        "sql",
-        "excel",
-        "machine learning",
-        "data analysis",
+        "python", "sql", "excel", "machine learning", "deep learning",
+        "data analysis", "pandas", "numpy", "matplotlib", "tensorflow",
+        "scikit-learn", "jupyter",
     ],
 }
 
@@ -81,9 +75,14 @@ def analyze_resume(file_path, target_role, file_name="resume.pdf", user_id=None)
         if os.path.exists(file_path):
             os.remove(file_path)
 
+    raw_text = text
     text = text.lower()
 
-    detected = [skill for skill in SKILLS if skill.lower() in text]
+    def skill_in_text(skill, text):
+        escaped = re.escape(skill)
+        return bool(re.search(rf'(?<![\w]){escaped}(?![\w])', text, re.IGNORECASE))
+
+    detected = [skill for skill in SKILLS if skill_in_text(skill, text)]
 
     matched = []
     missing = []
@@ -134,4 +133,5 @@ def analyze_resume(file_path, target_role, file_name="resume.pdf", user_id=None)
         "matched_skills": matched,
         "missing_skills": missing,
         "target_role": target_role,
+        "resume_text": raw_text,
     }

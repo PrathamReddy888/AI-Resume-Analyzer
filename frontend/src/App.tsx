@@ -7,6 +7,8 @@ import { HistorySidebar } from "./HistorySidebar";
 import { useAuth } from "./hooks/useAuth";
 import { AuthModal } from "./AuthModal";
 import { Footer } from "./Footer";
+import AnalysisSkeleton from "./components/AnalysisSkeleton/AnalysisSkeleton";
+
 type Theme = "light" | "dark";
 
 function getInitialTheme(): Theme {
@@ -20,6 +22,37 @@ function getInitialTheme(): Theme {
     // localStorage / matchMedia can throw in restricted privacy modes
   }
   return "light";
+}
+
+function highlightSkills(text: string, skills: string[]): React.ReactNode[] {
+  if (!text) return [];
+  if (skills.length === 0) return [text];
+
+  // Sort longest first so multi-word skills (e.g. "machine learning") match before shorter ones
+  const sorted = [...skills].sort((a, b) => b.length - a.length);
+  const escaped = sorted.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  // \b works for alphanumeric boundaries; for symbols like c++ we use lookahead/lookbehind
+  const pattern = new RegExp(`(?<![\\w])(${escaped.join('|')})(?![\\w])`, 'gi');
+  const parts = text.split(pattern);
+  const skillSet = new Set(skills.map(s => s.toLowerCase()));
+
+  return parts.map((part, i) =>
+    skillSet.has(part.toLowerCase())
+      ? <mark key={i} className="skill-highlight">{part}</mark>
+      : part
+  );
+}
+
+function ResumePreview({ text, skills }: { text: string; skills: string[] }) {
+  if (!text) return null;
+  return (
+    <div className="resume-preview mt-4">
+      <h4>📄 Resume Text Preview</h4>
+      <pre className="resume-preview__body">
+        {highlightSkills(text, skills)}
+      </pre>
+    </div>
+  );
 }
 
 function App() {
@@ -37,6 +70,7 @@ function App() {
   const [showAllSkills, setShowAllSkills] = useState(false);
   const [copied, setCopied] = useState(false);
   const [analysisSource, setAnalysisSource] = useState<"sample" | "upload" | null>(null);
+  const [resumeText, setResumeText] = useState<string>("");
 
   // Auth
   const { user, signup, login, logout } = useAuth();
@@ -136,6 +170,7 @@ function App() {
       setSuggestions(res.data.suggestions || []);
       setMatchedSkills(res.data.matched_skills || []);
       setMissingSkills(res.data.missing_skills || []);
+      setResumeText(res.data.resume_text || "");
       setActiveFileName(fileToAnalyze.name);
 
       setLoading(false);
@@ -208,10 +243,10 @@ function App() {
 
       setActiveFileName(sampleFile.name);
     } catch (error: unknown) {
-  console.error(error);
-  alert("Could not load sample resume");
-  setLoading(false);
-}
+      console.error(error);
+      alert("Could not load sample resume");
+      setLoading(false);
+    }
   };
 
   const resetAnalysis = () => {
@@ -221,6 +256,7 @@ function App() {
     setSuggestions([]);
     setMatchedSkills([]);
     setMissingSkills([]);
+    setResumeText("");
     setShowAllSkills(false);
     setCopied(false);
     setAnalysisSource(null);
@@ -349,17 +385,8 @@ function App() {
             </button>
           </div>
 
-          {/* Loading spinner — shown while the resume is being analyzed */}
-          {loading && (
-            <div
-              className="loader"
-              role="status"
-              aria-live="polite"
-              aria-label="Analyzing resume, please wait"
-            >
-              <span className="sr-only">Analyzing resume, please wait…</span>
-            </div>
-          )}
+          {/* Loading skeleton — shown while the resume is being analyzed */}
+          {loading && <AnalysisSkeleton />}
 
           {/* Results */}
           {score !== null && (
@@ -374,6 +401,8 @@ function App() {
               )}
 
               <AtsScore score={score} />
+
+              <ResumePreview text={resumeText} skills={skills} />
 
               <h5 className="analysis-done">✅ Resume Analysis Complete</h5>
               {activeFileName && (

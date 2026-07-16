@@ -603,3 +603,40 @@ border:0;
   margin: 0;
   opacity: 0.85;
 }
+
+/* ── Resume Preview Pane ────────────────── */
+
+.resume-preview {
+  text-align: left;
+}
+
+.resume-preview h4 {
+  margin-bottom: 10px;
+}
+
+.resume-preview__body {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 16px;
+  max-height: 320px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--card-text);
+  font-family: inherit;
+}
+
+.skill-highlight {
+  background: rgba(0, 255, 174, 0.3);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 2px;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .skill-highlight {
+  background: rgba(34, 211, 238, 0.3);
+}
