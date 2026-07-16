@@ -110,15 +110,17 @@ def analyze_resume(file_path, target_role, file_name="resume.pdf", user_id=None)
         try:
             user = User.objects.get(id=user_id)
 
-            ResumeAnalysis.objects.create(
+            analysis_record, created = ResumeAnalysis.objects.update_or_create(
                 user=user,
-                file_name=file_name,
-                score=score,
-                skills_found=detected,
-                suggestions=suggestions,
-                matched_skills=matched,
-                missing_skills=missing,
+                file_name=file_name,          
                 target_role=target_role,
+                defaults={
+                    'score': score,
+                    'skills_found': detected,
+                    'suggestions': suggestions,
+                    'matched_skills': matched,
+                    'missing_skills': missing,
+                }
             )
 
         except User.DoesNotExist:
