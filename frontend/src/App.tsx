@@ -7,7 +7,6 @@ import { HistorySidebar } from "./HistorySidebar";
 import { useAuth } from "./hooks/useAuth";
 import { AuthModal } from "./AuthModal";
 import { Footer } from "./Footer";
-
 type Theme = "light" | "dark";
 
 function getInitialTheme(): Theme {
@@ -44,12 +43,36 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // History
-  const { entries, deleteEntry, clearHistory, setEntries } = useAnalysisHistory();
+  const { entries, addEntry, deleteEntry, clearHistory, setEntries } = useAnalysisHistory();
   const [historyOpen, setHistoryOpen] = useState(false);
   const [activeFileName, setActiveFileName] = useState("");
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+  const handleDeleteEntry = async (id: string) => {
+    if (user) {
+      try {
+        await axios.delete(`${backendUrl}/api/history/${id}/`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+      } catch (error) {
+        console.error("Failed to delete from database", error);
+      }
+    }
+    deleteEntry(id);
+  };
 
+  const handleClearAll = async () => {
+    if (user) {
+      try {
+        await axios.delete(`${backendUrl}/api/history/clear/`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+      } catch (error) {
+        console.error("Failed to clear database history", error);
+      }
+    }
+    clearHistory();
+  };
   const fetchDbHistory = useCallback(async (token: string) => {
     try {
       const res = await axios.get(`${backendUrl}/api/history/`, {
@@ -70,7 +93,12 @@ function App() {
         targetRole: item.target_role,
         fileName: item.file_name,
       }));
-      setEntries(dbEntries);
+      const uniqueDbEntries = dbEntries.filter((entry, index, self) =>
+        index === self.findIndex((t) => (
+          t.fileName === entry.fileName && t.score === entry.score
+        ))
+      );
+      setEntries(uniqueDbEntries);
     } catch { /* silently ignore */ }
   }, [backendUrl, setEntries]);
 
@@ -114,7 +142,18 @@ function App() {
 
       if (user) {
         await fetchDbHistory(user.token);
-      }
+        }
+      else {
+        addEntry({
+          score: res.data.score,
+          skills: res.data.skills_found || [],
+          suggestions: res.data.suggestions || [],
+          matchedSkills: res.data.matched_skills || [],
+          missingSkills: res.data.missing_skills || [],
+          targetRole: targetRole,
+          fileName: fileToAnalyze.name,
+        });
+    }
     } catch (error: unknown) {
       console.error(error);
 
@@ -211,14 +250,17 @@ function App() {
     setCopied(false);
     setHistoryOpen(false);
   };
-
+  const handleLogout = () => {
+  logout();           
+  clearHistory();
+};
   return (
     <>
       <HistorySidebar
         entries={entries}
         onSelect={selectHistoryEntry}
-        onDelete={deleteEntry}
-        onClear={clearHistory}
+        onDelete={handleDeleteEntry}
+        onClear={handleClearAll}
         isOpen={historyOpen}
         onToggle={() => setHistoryOpen((v) => !v)}
       />
@@ -241,7 +283,7 @@ function App() {
             {user ? (
               <>
                 <span className="auth-username">👤 {user.username}</span>
-                <button className="auth-bar-btn" onClick={logout}>Logout</button>
+                <button className="auth-bar-btn" onClick={handleLogout}>Logout</button>
               </>
             ) : (
               <button className="auth-bar-btn" onClick={() => setShowAuthModal(true)}>🔐 Login / Sign Up</button>
