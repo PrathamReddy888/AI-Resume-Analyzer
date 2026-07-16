@@ -307,6 +307,18 @@ function App() {
             </button>
           </div>
 
+          {/* Loading spinner — shown while the resume is being analyzed */}
+          {loading && (
+            <div
+              className="loader"
+              role="status"
+              aria-live="polite"
+              aria-label="Analyzing resume, please wait"
+            >
+              <span className="sr-only">Analyzing resume, please wait…</span>
+            </div>
+          )}
+
           {/* Results */}
           {score !== null && (
             <>
