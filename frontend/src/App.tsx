@@ -202,10 +202,10 @@ function App() {
 
       setActiveFileName(sampleFile.name);
     } catch (error: unknown) {
-  console.error(error);
-  alert("Could not load sample resume");
-  setLoading(false);
-}
+      console.error(error);
+      alert("Could not load sample resume");
+      setLoading(false);
+    }
   };
 
   const resetAnalysis = () => {
@@ -290,10 +290,23 @@ function App() {
             />
           )}
 
-          <h1 className="mb-4">🚀 AI Resume Analyzer</h1>
+          <div className="hero-content">
+            <span className="hero-badge">
+              🚀 AI Powered Resume Analysis
+            </span>
+
+            <h1 className="hero-title">
+              Land More Interviews with an AI Resume Analyzer
+            </h1>
+
+            <p className="hero-subtitle">
+              Upload your resume, receive instant ATS insights, identify missing skills,
+              and optimize your resume for your target career.
+            </p>
+          </div>
 
           {/* Role Selector Dropdown */}
-          <div className="mb-4">
+          <div className="hero-role-selector">
             <label htmlFor="roleSelect" style={{ marginRight: "10px", fontWeight: "600", color: "#fff" }}>
               Target Career Track:
             </label>
@@ -323,7 +336,7 @@ function App() {
             </label>
           </div>
 
-          <div style={{ display: "flex", gap: "12px", justifyContent: "center", alignItems: "center" }} className="mb-3">
+          <div className="hero-actions">
             <button
               className="analyze-btn"
               onClick={uploadResume}
