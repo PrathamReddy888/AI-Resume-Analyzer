@@ -1,4 +1,12 @@
 :root{
+
+  /* ── Design Tokens: Color Palette ───────── */
+  --color-primary: #3b82f6;   /* blue — main interactive/accent color */
+  --color-secondary: #764ba2; /* purple — brand gradient color */
+  --color-accent: #22c55e;    /* green — success / positive states */
+  --color-neutral: #64748b;   /* slate gray — neutral text/borders */
+  --color-danger: #ef4444;    /* red — errors, destructive actions */
+
   /* ── Design Tokens: Spacing Scale ───────── */
   --space-1: 4px;
   --space-2: 8px;
@@ -16,6 +24,7 @@
   --text-md: 18px;
   --text-lg: 20px;
   --text-xl: 40px;
+
 
   color-scheme: light;
   --body-bg: linear-gradient(135deg,#667eea,#764ba2);
@@ -40,9 +49,9 @@
   --btn-secondary-text: #ffffff;
   --btn-secondary-border: rgba(255,255,255,0.3);
   --btn-secondary-hover-bg: rgba(255,255,255,0.25);
-  --btn-accent-bg: #3b82f6;
+  --btn-accent-bg: var(--color-primary);
   --btn-accent-hover-bg: #2563eb;
-  --btn-success-bg: #22c55e;
+  --btn-success-bg: var(--color-accent);
   --btn-accent-text: #ffffff;
   --footer-text: rgba(255,255,255,0.85);
   --footer-link: #ffffff;
@@ -72,9 +81,9 @@
   --btn-secondary-text: #e2e8f0;
   --btn-secondary-border: rgba(255,255,255,0.15);
   --btn-secondary-hover-bg: rgba(255,255,255,0.16);
-  --btn-accent-bg: #3b82f6;
+  --btn-accent-bg: var(--color-primary);
   --btn-accent-hover-bg: #60a5fa;
-  --btn-success-bg: #22c55e;
+  --btn-success-bg: var(--color-accent);
   --btn-accent-text: #ffffff;
   --footer-text: rgba(226,232,240,0.85);
   --footer-link: #e2e8f0;
@@ -328,7 +337,7 @@ border:0;
   position: absolute;
   top: -4px;
   right: -4px;
-  background: #ef4444;
+  background: var(--color-danger);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -377,7 +386,7 @@ border:0;
 
 .history-clear-btn {
   background: rgba(239,68,68,0.2);
-  color: #ef4444;
+  color: var(--color-danger);
   border: 1px solid rgba(239,68,68,0.4);
   padding: 4px 10px;
   border-radius: 6px;
@@ -551,11 +560,10 @@ border:0;
 .auth-input::placeholder { opacity: 0.6; }
 
 .auth-error {
-  color: #f87171;
+  color: var(--color-danger);
   font-size: 13px;
   margin-bottom: 10px;
 }
-
 .auth-submit-btn {
   width: 100%;
   padding: 10px;
