@@ -64,6 +64,7 @@ function App() {
   const [skills, setSkills] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
 
   // Component States
   const [targetRole, setTargetRole] = useState("Frontend Developer");
@@ -283,6 +284,7 @@ function App() {
     setCopied(false);
     setAnalysisSource(null);
     setActiveFileName("");
+    setShowExportDropdown(false);
   };
 
   const copySuggestionsToClipboard = () => {
@@ -296,6 +298,38 @@ function App() {
       .catch((err) => console.error("Failed to copy text: ", err));
   };
 
+  const getExportTimestamp = () => {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const d = new Date();
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+  };
+
+  const exportJSON = () => {
+    const data = { score, skills, suggestions };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `resume-analysis-${getExportTimestamp()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowExportDropdown(false);
+  };
+
+  const exportCSV = () => {
+    const escapeCSV = (str: string) => `"${str.replace(/"/g, '""')}"`;
+    const header = "score,skills,suggestions\n";
+    const row = `${score},${escapeCSV(skills.join(","))},${escapeCSV(suggestions.join(","))}\n`;
+    const blob = new Blob([header + row], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `resume-analysis-${getExportTimestamp()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowExportDropdown(false);
+  };
+
   const selectHistoryEntry = (entry: AnalysisEntry) => {
     setScore(entry.score);
     setSkills(entry.skills);
@@ -307,6 +341,7 @@ function App() {
     setShowAllSkills(false);
     setCopied(false);
     setHistoryOpen(false);
+    setShowExportDropdown(false);
   };
   const handleLogout = () => {
     logout();          
@@ -487,18 +522,67 @@ function App() {
 
               {/* SUGGESTIONS BOX WITH THE UTILITY BUTTON */}
               <div className="suggestion-box mt-4" style={{ padding: "15px" }}>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "between", alignItems: "center", marginBottom: "12px" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                   <h4 style={{ margin: 0 }}>💡 Suggestions</h4>
-                  {suggestions.length > 0 && (
-                    <button
-                      type="button"
-                      className={`app-btn app-btn--accent${copied ? " is-success" : ""}`}
-                      onClick={copySuggestionsToClipboard}
-                      style={{ minHeight: "44px" }}
-                    >
-                      {copied ? "✅ Copied!" : "📋 Copy Suggestions"}
-                    </button>
-                  )}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                    {suggestions.length > 0 && (
+                      <button
+                        type="button"
+                        className={`app-btn app-btn--accent${copied ? " is-success" : ""}`}
+                        onClick={copySuggestionsToClipboard}
+                        style={{ minHeight: "44px" }}
+                      >
+                        {copied ? "✅ Copied!" : "📋 Copy Suggestions"}
+                      </button>
+                    )}
+                    
+                    <div style={{ position: "relative", display: "inline-block" }}>
+                      <button
+                        type="button"
+                        className="app-btn app-btn--secondary"
+                        onClick={() => setShowExportDropdown(!showExportDropdown)}
+                        style={{ minHeight: "44px" }}
+                      >
+                        Export ▼
+                      </button>
+                      {showExportDropdown && (
+                        <div style={{
+                          position: "absolute",
+                          top: "100%",
+                          right: 0,
+                          marginTop: "4px",
+                          backgroundColor: theme === "dark" ? "#1f2937" : "#ffffff",
+                          border: `1px solid ${theme === "dark" ? "#374151" : "#e5e7eb"}`,
+                          borderRadius: "6px",
+                          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                          zIndex: 10,
+                          display: "flex",
+                          flexDirection: "column",
+                          minWidth: "120px",
+                          overflow: "hidden"
+                        }}>
+                          <button
+                            type="button"
+                            onClick={exportJSON}
+                            style={{ padding: "8px 12px", background: "transparent", border: "none", color: theme === "dark" ? "#f3f4f6" : "#111827", textAlign: "left", cursor: "pointer", borderBottom: `1px solid ${theme === "dark" ? "#374151" : "#e5e7eb"}` }}
+                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = theme === "dark" ? "#374151" : "#f3f4f6")}
+                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                          >
+                            Export JSON
+                          </button>
+                          <button
+                            type="button"
+                            onClick={exportCSV}
+                            style={{ padding: "8px 12px", background: "transparent", border: "none", color: theme === "dark" ? "#f3f4f6" : "#111827", textAlign: "left", cursor: "pointer" }}
+                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = theme === "dark" ? "#374151" : "#f3f4f6")}
+                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                          >
+                            Export CSV
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 
 
