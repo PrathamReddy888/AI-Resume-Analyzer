@@ -346,6 +346,8 @@ function App() {
     setShowExportDropdown(false);
   };
   const handleLogout = () => {
+
+    logout();
     logout();          
     clearHistory();
   };
@@ -383,6 +385,9 @@ function App() {
 
 <h1 className="mb-4 app-main-title" style={{ fontSize: "calc(1.5rem + 1.5vw)", wordBreak: "break-word" }}>🚀 AI Resume Analyzer</h1>
           {/* Role Selector Dropdown */}
+          <div className="mb-4">
+            <label htmlFor="roleSelect" style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#e2e8f0", fontSize: "var(--font-size-sm)" }}>
+              1️⃣ Choose your Target Career Track
           <div className="mb-4 d-flex flex-column align-items-center flex-sm-row justify-content-center role-selector-container" style={{ gap: "8px" }}>
             <label htmlFor="roleSelect" className="role-select-label" style={{ fontWeight: "600" }}>
               Target Career Track:
@@ -392,7 +397,11 @@ function App() {
               className="role-select-dropdown"
               value={targetRole}
               onChange={(e) => setTargetRole(e.target.value)}
+
+              style={{ padding: "10px 16px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.15)", width: "100%", maxWidth: "320px", background: "#1e1e2f", color: "#fff", fontSize: "var(--font-size-sm)" }}
+
               style={{ padding: "6px 12px", borderRadius: "6px", width: "100%", maxWidth: "250px" }}
+
             >
               <option value="Frontend Developer">Frontend Developer</option>
               <option value="Backend Developer">Backend Developer</option>
@@ -400,7 +409,12 @@ function App() {
             </select>
           </div>
 
+
+          <div className="upload-box mb-3">
+
+
           <div className="upload-box mb-3" style={{ width: "100%", maxWidth: "100%" }}>
+
             <input
               type="file"
               id="fileUpload"
@@ -409,8 +423,13 @@ function App() {
                 if (e.target.files) setFile(e.target.files[0]);
               }}
             />
+
+            <label htmlFor="fileUpload" className="upload-label" style={{ cursor: "pointer", display: "block", fontSize: "var(--font-size-base)" }}>
+              📄 {file ? <strong style={{ color: "#a5b4fc" }}>{file.name}</strong> : "Drag & Drop Resume or Click to Browse"}
+
             <label htmlFor="fileUpload" className="upload-label" style={{ display: "block", wordBreak: "break-all", padding: "15px" }}>
               📄 {file ? file.name : "Drag & Drop Resume or Click to Upload"}
+
             </label>
           </div>
 
@@ -430,7 +449,19 @@ function App() {
               onClick={handleSampleResume}
               disabled={loading}
               type="button"
+
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "#94a3b8",
+                fontSize: "var(--font-size-sm)",
+                textDecoration: "underline",
+                cursor: "pointer",
+                marginTop: "4px"
+              }}
+
               style={{ minHeight: "44px", flex: "1 1 200px", maxWidth: "100%" }}
+
             >
               {loading && analysisSource === "sample" ? "⏳ Loading..." : "Try Sample Resume"}
             </button>
@@ -462,7 +493,11 @@ function App() {
 
               <h5 className="analysis-done mt-3">✅ Resume Analysis Complete</h5>
               {activeFileName && (
+
+                <p style={{ fontSize: "var(--font-size-sm)", opacity: 0.7, marginTop: "-8px" }}>📄 {activeFileName}</p>
+
                 <p style={{ fontSize: "13px", opacity: 0.7, marginTop: "-8px", wordBreak: "break-all" }}>📄 {activeFileName}</p>
+
               )}
 
               {/* Skills container */}
