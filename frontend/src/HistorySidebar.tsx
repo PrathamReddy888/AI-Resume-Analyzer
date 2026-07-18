@@ -5,6 +5,7 @@ const PAGE_SIZE = 10;
 
 interface HistorySidebarProps {
   entries: AnalysisEntry[];
+  activeFileName?: string;
   onSelect: (entry: AnalysisEntry) => void;
   onDelete: (id: string) => void;
   onClear: () => void;
@@ -14,6 +15,7 @@ interface HistorySidebarProps {
 
 export const HistorySidebar: React.FC<HistorySidebarProps> = ({
   entries,
+  activeFileName,
   onSelect,
   onDelete,
   onClear,
@@ -63,7 +65,10 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
       </button>
 
       {/* Sidebar panel */}
-      <div className={`history-sidebar ${isOpen ? "history-sidebar--open" : ""}`}>
+      <div 
+        className={`history-sidebar ${isOpen ? "history-sidebar--open" : ""}`}
+        aria-hidden={!isOpen}
+      >
         <div className="history-sidebar-header">
           <h3>📚 History</h3>
           {entries.length > 0 && (
@@ -92,8 +97,17 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
               {entries.slice(0, visibleCount).map((entry) => (
                 <li
                   key={entry.id}
-                  className="history-item"
+                  role="button"
+                  tabIndex={0}
+                  aria-current={activeFileName === entry.fileName ? "true" : undefined}
+                  className={`history-item ${activeFileName === entry.fileName ? 'history-item--active' : ''}`}
                   onClick={() => onSelect(entry)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onSelect(entry);
+                    }
+                  }}
                 >
                   <div className="history-item-top">
                     <span className="history-item-score">{entry.score}%</span>
@@ -103,9 +117,13 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
                         e.stopPropagation();
                         onDelete(entry.id);
                       }}
+                      aria-label="Delete analysis"
                       title="Delete entry"
                     >
-                      🗑️
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
                     </button>
                   </div>
                   <div className="history-item-role">{entry.targetRole}</div>
