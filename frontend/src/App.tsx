@@ -9,6 +9,7 @@ import { AuthModal } from "./AuthModal";
 import { Footer } from "./Footer";
 import AnalysisSkeleton from "./components/AnalysisSkeleton/AnalysisSkeleton";
 import { InfoTooltip } from "./components/InfoTooltip";
+import { Navbar } from "./components/Navbar";
 
 type Theme = "light" | "dark";
 
@@ -359,30 +360,17 @@ function App() {
         onToggle={() => setHistoryOpen((v) => !v)}
       />
 
+      <Navbar
+        theme={theme}
+        toggleTheme={toggleTheme}
+        user={user}
+        onLogin={() => setShowAuthModal(true)}
+        onLogout={handleLogout}
+        onHistoryClick={() => setHistoryOpen(true)}
+      />
+
       <div className="container mt-5 px-3"> {/* Added padding safety track */}
         <div className="main-card text-center mx-auto" style={{ width: "100%", maxWidth: "600px" }}>
-          {/* Theme toggle */}
-          <button
-            type="button"
-            className="app-btn theme-toggle-btn"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            aria-pressed={theme === "dark"}
-          >
-            {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
-          </button>
-
-          {/* Auth bar */}
-          <div className="auth-bar">
-            {user ? (
-              <>
-                <span className="auth-username">👤 {user.username}</span>
-                <button className="auth-bar-btn" onClick={handleLogout}>Logout</button>
-              </>
-            ) : (
-              <button className="auth-bar-btn" onClick={() => setShowAuthModal(true)}>🔐 Login / Sign Up</button>
-            )}
-          </div>
 
           {showAuthModal && (
             <AuthModal
@@ -462,7 +450,9 @@ function App() {
                 </div>
               )}
 
-              <AtsScore score={score} />
+              <div id="ats-score">
+                <AtsScore score={score} />
+              </div>
 
               <ResumePreview text={resumeText} skills={skills} />
 
