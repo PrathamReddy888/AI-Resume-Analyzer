@@ -10,6 +10,7 @@ import { Footer } from "./Footer";
 import AnalysisSkeleton from "./components/AnalysisSkeleton/AnalysisSkeleton";
 import { InfoTooltip } from "./components/InfoTooltip";
 import { Navbar } from "./components/Navbar";
+import EmptyState from "./components/EmptyState";
 
 type Theme = "light" | "dark";
 
@@ -437,6 +438,9 @@ function App() {
 
           {/* Loading skeleton — shown while the resume is being analyzed */}
           {loading && <AnalysisSkeleton />}
+          {score === null && !loading && (
+  <EmptyState />
+)}
 
           {/* Results */}
           {score !== null && (
