@@ -702,6 +702,45 @@ border:0;
   font-size: 14px;
 }
 
+/* ── Back to top ──────────────────────── */
+
+.back-to-top{
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1002;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: var(--btn-accent-bg);
+  color: var(--btn-accent-text);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s ease;
+}
+
+.back-to-top--visible{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top:hover{
+  background: var(--btn-accent-hover-bg);
+}
+
+.back-to-top:focus-visible{
+  outline: 2px solid var(--score-accent);
+  outline-offset: 2px;
+}
+
 .app-footer__links{
   display: flex;
   flex-wrap: wrap;
@@ -878,6 +917,59 @@ border:0;
 .password-strength-label span.strength-val.weak {
   color: var(--color-danger);
 }
+
+/* ==========================================================================
+   ✨ Issue #111: App-Wide Smooth Performance Animations 
+   ========================================================================== */
+
+/* Hardware accelerated transition defaults for interactive elements */
+.app-btn, .analyze-btn, .secondary-btn, .auth-bar-btn, .theme-toggle-btn, select, input {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Button Hover Micro-interactions */
+.app-btn:hover, .analyze-btn:hover, .secondary-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.app-btn:active, .analyze-btn:active, .secondary-btn:active {
+  transform: translateY(0);
+}
+
+/* Base Card Entrance Animations */
+.main-card {
+  animation: cardEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Upload Box Pulse Animation when file changes */
+.upload-box {
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+.upload-box:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.02);
+}
+
+/* Smooth Results Container Slide-In Triggers */
+.analysis-done, .resume-preview, .suggestions-grid, .matrix-grid {
+  animation: slideInUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Stagger targets for results elements */
+.resume-preview { animation-delay: 0.05s; }
+.matrix-grid { animation-delay: 0.1s; }
+.suggestions-grid { animation-delay: 0.15s; }
+
+/* Global Keyframe Definitions */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+
+
 /* Suggestions Section Grid Layout */
 .suggestions-grid {
   display: grid;
@@ -981,12 +1073,24 @@ border:0;
   from {
     opacity: 0;
     transform: translateY(-4px);
+
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
+
+@keyframes slideInUpSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
 
 /* ── Responsive Navbar ───────────────────── */
@@ -1137,6 +1241,93 @@ border:0;
     padding: 2rem;
   }
 }
+/* ==========================================================================
+   ⌨️ Issue #154: Keyboard Shortcuts & Help Indicator Styles
+   ========================================================================== */
+
+/* Floating Help Toggle Trigger */
+.shortcut-help-trigger {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(30, 30, 47, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a5b4fc;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.shortcut-help-trigger:hover {
+  background: #6366f1;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Floating Overlay Panel Box */
+.shortcut-overlay-card {
+  position: fixed;
+  bottom: 70px;
+  right: 20px;
+  background: #1e1e2f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  width: 280px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  text-align: left;
+  animation: slideUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.shortcut-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  font-size: 13px;
+}
+
+.shortcut-key-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.25);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #fff;
+
+
+/* Footer Hyperlink Micro-Interactions */
+.footer-link:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+
+.footer-icon-link:hover {
+  color: #6366f1 !important;
+  transform: scale(1.1);
+}
+
+/* Ensure container grid alignment wraps beautifully on tight mobile layouts */
+@media (max-width: 600px) {
+  .app-footer {
+    padding: 30px 16px 16px !important;
+  }
+  .app-footer .container {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
 
 /* Dark mode override for the card container */
 [data-theme="dark"] .app-card-container {
@@ -1435,4 +1626,6 @@ border:0;
   .hero-container .action-buttons {
     justify-content: flex-start !important;
   }
+}
+
 }
